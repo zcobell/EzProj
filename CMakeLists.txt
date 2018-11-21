@@ -37,9 +37,7 @@ ENDIF()
 ###########################################################################
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
 PROJECT(EZPROJ)
-IF(NOT DEFINED(BUILD_SHARED))
-    OPTION(BUILD_SHARED "Build shared libraries" OFF)
-ENDIF()
+OPTION(BUILD_SHARED "Build shared libraries" OFF)
 IF(BUILD_SHARED)
     SET(LIBTYPE SHARED)
 ELSE(BUILD_SHARED)
@@ -376,8 +374,8 @@ ADD_LIBRARY( proj  STATIC ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/nad_init.
                             ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/vector1.c
                             ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_strtod.c )
 
-TARGET_INCLUDE_DIRECTORIES( proj PRIVATE ${CMAKE_SOURCE_DIR}/proj/proj5.1/src
-                                ${CMAKE_SOURCE_DIR}/src/
+TARGET_INCLUDE_DIRECTORIES( proj PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src
+                                ${CMAKE_CURRENT_SOURCE_DIR}/src/
                                 ${CMAKE_BINARY_DIR}/CMakeFiles/pj_config )
 
 IF (C99_MATH)
@@ -400,21 +398,13 @@ ADD_LIBRARY( ezproj ${LIBTYPE} ${CMAKE_CURRENT_SOURCE_DIR}/src/epsg.cpp
                            ${CMAKE_CURRENT_SOURCE_DIR}/src/point.cpp )
 TARGET_INCLUDE_DIRECTORIES( ezproj PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src
                            ${CMAKE_CURRENT_SOURCE_DIR}/src
-                           ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/pj_config )
+                           ${CMAKE_BINARY_DIR}/CMakeFiles/pj_config )
 SET(HEADER_LIST ${CMAKE_CURRENT_SOURCE_DIR}/src/ezproj.h ${CMAKE_CURRENT_SOURCE_DIR}/src/point.h )
 TARGET_LINK_LIBRARIES( ezproj proj )
 ADD_DEPENDENCIES( ezproj proj )
 SET(HEADER_DEST "include")
 SET_TARGET_PROPERTIES( ezproj PROPERTIES PUBLIC_HEADER "${HEADER_LIST}" ) 
-IF(BUILD_SHARED)
-    IF(WIN32 OR CYGWIN)
-        INSTALL(TARGETS ezproj RUNTIME DESTINATION lib PUBLIC_HEADER DESTINATION include)
-    ELSE(WIN32 OR CYGWIN)
-        INSTALL(TARGETS ezproj LIBRARY DESTINATION lib PUBLIC_HEADER DESTINATION include)
-    ENDIF(WIN32 OR CYGWIN)
-ELSE(BUILD_SHARED)
-    INSTALL(TARGETS ezproj ARCHIVE DESTINATION lib PUBLIC_HEADER DESTINATION include)
-ENDIF(BUILD_SHARED)
+INSTALL(TARGETS ezproj ARCHIVE DESTINATION lib LIBRARY DESTINATION lib PUBLIC_HEADER DESTINATION include)
 ###########################################################################
 
 
@@ -427,16 +417,5 @@ TARGET_INCLUDE_DIRECTORIES( ezprojf PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src )
 ADD_DEPENDENCIES( ezprojf ezproj )
 TARGET_LINK_LIBRARIES(ezprojf ezproj)
 SET_TARGET_PROPERTIES(ezprojf PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeFiles/mod/ezprojf)
-IF(BUILD_SHARED)
-    IF(WIN32 OR CYGWIN)
-        INSTALL(TARGETS ezprojf RUNTIME DESTINATION lib)
-    ELSE(WIN32 OR CYGWIN)
-        INSTALL(TARGETS ezprojf LIBRARY DESTINATION lib)
-    ENDIF(WIN32 OR CYGWIN)
-ELSE(BUILD_SHARED)
-    INSTALL(TARGETS ezprojf ARCHIVE DESTINATION lib)
-ENDIF(BUILD_SHARED)
-INSTALL ( CODE
-  "EXECUTE_PROCESS (COMMAND \"${CMAKE_COMMAND}\" -E copy_directory \"${CMAKE_BINARY_DIR}/CMakeFiles/mod/ezprojf\" \"${CMAKE_INSTALL_PREFIX}/include\")"
-)
+INSTALL(TARGETS ezprojf ARCHIVE DESTINATION lib LIBRARY DESTINATION lib)
 ###########################################################################
