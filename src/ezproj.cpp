@@ -144,10 +144,8 @@ int Ezproj::transform(int inputEPSG, int outputEPSG, std::vector<Point> &input,
 }
 
 bool Ezproj::containsEpsg(int epsg) {
-  return std::find(this->m_epsgMapping->begin(), this->m_epsgMapping->end(),
-                   epsg) == this->m_epsgMapping->end()
-             ? false
-             : true;
+  return this->m_epsgMapping->find(epsg) == this->m_epsgMapping->end() ? false
+                                                                       : true;
 }
 
 int Ezproj::cpp(double lambda0, double phi0, double x, double y, double &outx,
