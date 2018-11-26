@@ -58,6 +58,8 @@ class Ezproj {
   std::string description(int epsg);
   std::string projInitializationString(int epsg);
 
+  bool containsEpsg(int epsg);
+
   static int cpp(double lambda0, double phi0, double x, double y, double &outx,
                  double &outy);
   static int cpp(double lambda0, double phi0, Point &input, Point &output);
