@@ -22,6 +22,10 @@
 #include <limits>
 #include "proj.h"
 
+constexpr double s_pi = 3.14159265358979323846;
+constexpr double s_torad = s_pi / 180.0;
+constexpr double s_todeg = 180.0 / s_pi;
+
 /** \brief Constructor for the proj4 wrapper class
  *
  * Constructs an object used to convert coordinates. The initialization function
@@ -115,8 +119,8 @@ int Ezproj::transform(int inputEPSG, int outputEPSG,
     PJ_COORD c, o;
 
     if (proj_angular_input(pj1, PJ_INV)) {
-      c.lp.lam = proj_torad(input[i].first);
-      c.lp.phi = proj_torad(input[i].second);
+      c.lp.lam = input[i].first * s_torad;
+      c.lp.phi = input[i].second * s_torad;
     } else {
       c.xy.x = input[i].first;
       c.xy.y = input[i].second;
@@ -170,13 +174,13 @@ int Ezproj::cpp(double lambda0, double phi0,
   assert(input.size() > 0);
   if (input.size() <= 0) return Ezproj::NoData;
 
-  double slam0 = proj_torad(lambda0);
-  double sfea0 = proj_torad(phi0);
+  double slam0 = lambda0 * s_torad;
+  double sfea0 = phi0 * s_torad;
   double r = Ezproj::radiusEarth(phi0);
   output.reserve(input.size());
   for (auto &p : input) {
-    double x = r * proj_torad(p.first - slam0) * cos(sfea0);
-    double y = r * proj_torad(p.second);
+    double x = r * (s_torad * p.first - slam0) * cos(sfea0);
+    double y = r * (s_torad * p.second);
     output.push_back(std::pair<double, double>(x, y));
   }
   return Ezproj::NoError;
@@ -208,13 +212,13 @@ int Ezproj::inverseCpp(double lambda0, double phi0,
   assert(input.size() > 0);
   if (input.size() <= 0) return Ezproj::NoData;
 
-  double slam0 = proj_torad(lambda0);
-  double sfea0 = proj_torad(phi0);
+  double slam0 = s_torad * lambda0;
+  double sfea0 = s_torad * phi0;
   double r = Ezproj::radiusEarth(phi0);
   output.reserve(input.size());
   for (auto &p : input) {
-    double x = proj_todeg(slam0 + p.first / (r * cos(sfea0)));
-    double y = proj_todeg(p.second / r);
+    double x = s_todeg * (slam0 + p.first / (r * cos(sfea0)));
+    double y = s_todeg * (p.second / r);
     output.push_back(std::pair<double, double>(x, y));
   }
   return Ezproj::NoError;
@@ -254,7 +258,7 @@ size_t Ezproj::position(int epsg) {
 }
 
 double Ezproj::radiusEarth(double latitude) {
-  double l = proj_torad(latitude);
+  double l = s_torad * latitude;
   return sqrt((pow(Ezproj::equitoralRadius(), 4.0) * cos(l) * cos(l) +
                pow(Ezproj::polarRadius(), 4.0) * sin(l) * sin(l)) /
               (pow(Ezproj::equitoralRadius(), 2.0) * cos(l) * cos(l) +

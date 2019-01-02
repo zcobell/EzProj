@@ -209,4 +209,4 @@ HEADERS += epsg.h \
 SOURCES += $$SOURCES_PROJ epsg.cpp \
     ezproj.cpp
 
-INCLUDEPATH += $$PROJPATH $$PWD/../proj/proj5.1
+INCLUDEPATH += $$PROJPATH $$PWD/../thirdparty/proj/proj5.1
