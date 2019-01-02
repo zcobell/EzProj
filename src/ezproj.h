@@ -33,9 +33,8 @@
 #define EZPROJ_H
 
 #include <string>
-#include <tuple>
+#include <utility>
 #include <vector>
-#include "point.h"
 
 #ifdef USE_GOOGLE_FLAT_MAP
 #include "absl/container/flat_hash_map.h"
@@ -54,11 +53,12 @@ class Ezproj {
   int transform(int inputEPSG, int outputEPSG, double x, double y, double &outx,
                 double &outy, bool &isLatLon);
 
-  int transform(int inputEPSG, int outputEPSG, Point &input, Point &output,
-                bool &isLatLon);
+  int transform(int inputEPSG, int outputEPSG, std::pair<double, double> &input,
+                std::pair<double, double> &output, bool &isLatLon);
 
-  int transform(int inputEPSG, int outputEPSG, std::vector<Point> &input,
-                std::vector<Point> &output, bool &isLatLon);
+  int transform(int inputEPSG, int outputEPSG,
+                std::vector<std::pair<double, double>> &input,
+                std::vector<std::pair<double, double>> &output, bool &isLatLon);
 
   std::string description(int epsg);
   std::string projInitializationString(int epsg);
@@ -67,33 +67,34 @@ class Ezproj {
 
   static int cpp(double lambda0, double phi0, double x, double y, double &outx,
                  double &outy);
-  static int cpp(double lambda0, double phi0, Point &input, Point &output);
-  static int cpp(double lambda0, double phi0, std::vector<Point> &input,
-                 std::vector<Point> &output);
+  static int cpp(double lambda0, double phi0, std::pair<double, double> &input,
+                 std::pair<double, double> &output);
+  static int cpp(double lambda0, double phi0,
+                 std::vector<std::pair<double, double>> &input,
+                 std::vector<std::pair<double, double>> &output);
 
   static int inverseCpp(double lambda0, double phi0, double x, double y,
                         double &outx, double &outy);
-  static int inverseCpp(double lambda0, double phi0, Point &input,
-                        Point &output);
-  static int inverseCpp(double lambda0, double phi0, std::vector<Point> &input,
-                        std::vector<Point> &output);
+  static int inverseCpp(double lambda0, double phi0,
+                        std::pair<double, double> &input,
+                        std::pair<double, double> &output);
+  static int inverseCpp(double lambda0, double phi0,
+                        std::vector<std::pair<double, double>> &input,
+                        std::vector<std::pair<double, double>> &output);
 
  private:
   void _initialize();
 
   size_t position(int epsg);
 
-  static double deg2rad();
-  static double rad2deg();
-  static double toRadians(double degrees);
-  static double toDegrees(double radians);
+  static constexpr double equitoralRadius() { return 6378137.0; }
+  static constexpr double polarRadius() { return 6356752.3; }
+  static constexpr double meanRadiusEarth() { return 6378206.4; }
   static double radiusEarth(double latitude);
-  static double radiusEarth();
-  static double equitoralRadius();
-  static double polarRadius();
 
   const std::vector<const char *> *m_epsgDescriptions;
   const std::vector<const char *> *m_epsgInit;
+
 #ifdef USE_GOOGLE_FLAT_MAP
   const absl::flat_hash_map<int, size_t> *m_epsgMapping;
 #else

@@ -20,15 +20,7 @@
 #include <cassert>
 #include <cmath>
 #include <limits>
-#include "point.h"
 #include "proj.h"
-
-static const double c_pi = 4.0 * atan2(1.0, 1.0);
-static const double c_deg2rad = c_pi / 180.0;
-static const double c_rad2deg = 180.0 / c_pi;
-static const double c_equitoralRadius = 6378137.0;
-static const double c_polarRadius = 6356752.3;
-static const double c_meanRadiusEarth = 6378206.4;
 
 /** \brief Constructor for the proj4 wrapper class
  *
@@ -43,17 +35,20 @@ Ezproj::Ezproj() { this->_initialize(); }
  *
  * @param[in]  inputEPSG  EPSG that coordinates are currently in
  * @param[in]  outputEPSG EPSG that the coordinates will be converted to
- * @param[in]  input      Point object containing the location to be converted
- * @param[out] output     Point object containing the converted coordiantes
+ * @param[in]  input      std::pair<double,double> object containing the
+ *location to be converted
+ * @param[out] output     std::pair<double,double> object containing the
+ *converted coordiantes
  * @param[out] isLatLon   Bool that determine if the coordinates are lat/lon or
  *otherwise
  *
  * Function to execute a coordinate system transformation using Proj4
  *
  **/
-int Ezproj::transform(int inputEPSG, int outputEPSG, Point &input,
-                      Point &output, bool &isLatLon) {
-  std::vector<Point> in, out;
+int Ezproj::transform(int inputEPSG, int outputEPSG,
+                      std::pair<double, double> &input,
+                      std::pair<double, double> &output, bool &isLatLon) {
+  std::vector<std::pair<double, double>> in, out;
   in.push_back(input);
   int ierr = this->transform(inputEPSG, outputEPSG, in, out, isLatLon);
   if (ierr != Ezproj::NoError) return ierr;
@@ -63,11 +58,11 @@ int Ezproj::transform(int inputEPSG, int outputEPSG, Point &input,
 
 int Ezproj::transform(int inputEPSG, int outputEPSG, double x, double y,
                       double &outx, double &outy, bool &isLatLon) {
-  Point in(x, y), out;
+  std::pair<double, double> in(x, y), out;
   int ierr = this->transform(inputEPSG, outputEPSG, in, out, isLatLon);
   if (ierr != Ezproj::NoError) return ierr;
-  outx = out.x();
-  outy = out.y();
+  outx = out.first;
+  outy = out.second;
   return ierr;
 }
 
@@ -75,9 +70,9 @@ int Ezproj::transform(int inputEPSG, int outputEPSG, double x, double y,
  *
  * @param[in]  inputEPSG  EPSG that coordinates are currently in
  * @param[in]  outputEPSG EPSG that the coordinates will be converted to
- * @param[in]  input      vector of Point objects containing the locations
+ * @param[in]  input      vector of pairs containing the locations
  *                        to be converted
- * @param[out] output     vector of Point objects containing the converted
+ * @param[out] output     vector of pairs containing the converted
  *                        coordiantes
  * @param[out] isLatLon   Bool that determine if the coordinates are lat/lon or
  *                        otherwise
@@ -85,8 +80,10 @@ int Ezproj::transform(int inputEPSG, int outputEPSG, double x, double y,
  * Function to execute a coordinate system transformation using Proj4
  *
  **/
-int Ezproj::transform(int inputEPSG, int outputEPSG, std::vector<Point> &input,
-                      std::vector<Point> &output, bool &isLatLon) {
+int Ezproj::transform(int inputEPSG, int outputEPSG,
+                      std::vector<std::pair<double, double>> &input,
+                      std::vector<std::pair<double, double>> &output,
+                      bool &isLatLon) {
   assert(input.size() > 0);
   if (input.size() <= 0) return Ezproj::NoData;
 
@@ -118,22 +115,22 @@ int Ezproj::transform(int inputEPSG, int outputEPSG, std::vector<Point> &input,
     PJ_COORD c, o;
 
     if (proj_angular_input(pj1, PJ_INV)) {
-      c.lp.lam = proj_torad(input[i].x());
-      c.lp.phi = proj_torad(input[i].y());
+      c.lp.lam = proj_torad(input[i].first);
+      c.lp.phi = proj_torad(input[i].second);
     } else {
-      c.xy.x = input[i].x();
-      c.xy.y = input[i].y();
+      c.xy.x = input[i].first;
+      c.xy.y = input[i].second;
     }
 
     o = proj_trans(pj2, PJ_FWD, proj_trans(pj1, PJ_INV, c));
 
     if (proj_angular_output(pj2, PJ_FWD)) {
-      output[i].setX(proj_todeg(o.lp.lam));
-      output[i].setY(proj_todeg(o.lp.phi));
+      output[i].first = proj_todeg(o.lp.lam);
+      output[i].second = proj_todeg(o.lp.phi);
       isLatLon = true;
     } else {
-      output[i].setX(o.xy.x);
-      output[i].setY(o.xy.y);
+      output[i].first = o.xy.x;
+      output[i].second = o.xy.y;
       isLatLon = false;
     }
   }
@@ -150,71 +147,75 @@ bool Ezproj::containsEpsg(int epsg) {
 
 int Ezproj::cpp(double lambda0, double phi0, double x, double y, double &outx,
                 double &outy) {
-  Point i(x, y), o;
+  std::pair<double, double> i(x, y), o;
   int ierr = Ezproj::cpp(lambda0, phi0, i, o);
   if (ierr != Ezproj::NoError) return ierr;
-  outx = o.x();
-  outy = o.y();
+  outx = o.first;
+  outy = o.second;
   return Ezproj::NoError;
 }
 
-int Ezproj::cpp(double lambda0, double phi0, Point &input, Point &output) {
-  std::vector<Point> in, out;
+int Ezproj::cpp(double lambda0, double phi0, std::pair<double, double> &input,
+                std::pair<double, double> &output) {
+  std::vector<std::pair<double, double>> in, out;
   in.push_back(input);
   int ierr = Ezproj::cpp(lambda0, phi0, in, out);
   if (ierr == Ezproj::NoError) output = out.at(0);
   return ierr;
 }
 
-int Ezproj::cpp(double lambda0, double phi0, std::vector<Point> &input,
-                std::vector<Point> &output) {
+int Ezproj::cpp(double lambda0, double phi0,
+                std::vector<std::pair<double, double>> &input,
+                std::vector<std::pair<double, double>> &output) {
   assert(input.size() > 0);
   if (input.size() <= 0) return Ezproj::NoData;
 
-  double slam0 = Ezproj::toRadians(lambda0);
-  double sfea0 = Ezproj::toRadians(phi0);
+  double slam0 = proj_torad(lambda0);
+  double sfea0 = proj_torad(phi0);
   double r = Ezproj::radiusEarth(phi0);
   output.reserve(input.size());
   for (auto &p : input) {
-    double x = r * (Ezproj::toRadians(p.x()) - slam0) * cos(sfea0);
-    double y = r * (Ezproj::toRadians(p.y()));
-    output.push_back(Point(x, y));
+    double x = r * proj_torad(p.first - slam0) * cos(sfea0);
+    double y = r * proj_torad(p.second);
+    output.push_back(std::pair<double, double>(x, y));
   }
   return Ezproj::NoError;
 }
 
 int Ezproj::inverseCpp(double lambda0, double phi0, double x, double y,
                        double &outx, double &outy) {
-  Point i(x, y), o;
+  std::pair<double, double> i(x, y), o;
   int ierr = Ezproj::inverseCpp(lambda0, phi0, i, o);
   if (ierr != Ezproj::NoError) return ierr;
-  outx = o.x();
-  outy = o.y();
+  outx = o.first;
+  outy = o.second;
   return Ezproj::NoError;
 }
 
-int Ezproj::inverseCpp(double lambda0, double phi0, Point &input,
-                       Point &output) {
-  std::vector<Point> in, out;
+int Ezproj::inverseCpp(double lambda0, double phi0,
+                       std::pair<double, double> &input,
+                       std::pair<double, double> &output) {
+  std::vector<std::pair<double, double>> in, out;
   in.push_back(input);
   int ierr = Ezproj::inverseCpp(lambda0, phi0, in, out);
   if (ierr == Ezproj::NoError) output = out.at(0);
   return ierr;
 }
 
-int Ezproj::inverseCpp(double lambda0, double phi0, std::vector<Point> &input,
-                       std::vector<Point> &output) {
+int Ezproj::inverseCpp(double lambda0, double phi0,
+                       std::vector<std::pair<double, double>> &input,
+                       std::vector<std::pair<double, double>> &output) {
   assert(input.size() > 0);
   if (input.size() <= 0) return Ezproj::NoData;
 
-  double slam0 = Ezproj::toRadians(lambda0);
-  double sfea0 = Ezproj::toRadians(phi0);
+  double slam0 = proj_torad(lambda0);
+  double sfea0 = proj_torad(phi0);
   double r = Ezproj::radiusEarth(phi0);
   output.reserve(input.size());
   for (auto &p : input) {
-    double x = Ezproj::toDegrees(slam0 + p.x() / (r * cos(sfea0)));
-    double y = Ezproj::toDegrees(p.y() / r);
-    output.push_back(Point(x, y));
+    double x = proj_todeg(slam0 + p.first / (r * cos(sfea0)));
+    double y = proj_todeg(p.second / r);
+    output.push_back(std::pair<double, double>(x, y));
   }
   return Ezproj::NoError;
 }
@@ -252,22 +253,8 @@ size_t Ezproj::position(int epsg) {
   }
 }
 
-double Ezproj::deg2rad() { return c_deg2rad; }
-
-double Ezproj::rad2deg() { return c_rad2deg; }
-
-double Ezproj::toDegrees(double radians) { return radians * Ezproj::rad2deg(); }
-
-double Ezproj::toRadians(double degrees) { return degrees * Ezproj::deg2rad(); }
-
-double Ezproj::equitoralRadius() { return c_equitoralRadius; }
-
-double Ezproj::polarRadius() { return c_polarRadius; }
-
-double Ezproj::radiusEarth() { return c_meanRadiusEarth; }
-
 double Ezproj::radiusEarth(double latitude) {
-  double l = Ezproj::toRadians(latitude);
+  double l = proj_torad(latitude);
   return sqrt((pow(Ezproj::equitoralRadius(), 4.0) * cos(l) * cos(l) +
                pow(Ezproj::polarRadius(), 4.0) * sin(l) * sin(l)) /
               (pow(Ezproj::equitoralRadius(), 2.0) * cos(l) * cos(l) +

@@ -419,12 +419,11 @@ ENDIF()
 #  EZPROJ 
 ###########################################################################
 ADD_LIBRARY( ezproj ${LIBTYPE} ${CMAKE_CURRENT_SOURCE_DIR}/src/epsg.cpp
-                           ${CMAKE_CURRENT_SOURCE_DIR}/src/ezproj.cpp
-                           ${CMAKE_CURRENT_SOURCE_DIR}/src/point.cpp )
+                           ${CMAKE_CURRENT_SOURCE_DIR}/src/ezproj.cpp )
 TARGET_INCLUDE_DIRECTORIES( ezproj PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src
                            ${CMAKE_CURRENT_SOURCE_DIR}/src
                            ${CMAKE_BINARY_DIR}/CMakeFiles/pj_config )
-SET(HEADER_LIST ${CMAKE_CURRENT_SOURCE_DIR}/src/ezproj.h ${CMAKE_CURRENT_SOURCE_DIR}/src/point.h )
+SET(HEADER_LIST ${CMAKE_CURRENT_SOURCE_DIR}/src/ezproj.h ) 
 TARGET_LINK_LIBRARIES( ezproj proj )
 ADD_DEPENDENCIES( ezproj proj )
 IF(USE_GOOGLE_FLAT_MAP)
