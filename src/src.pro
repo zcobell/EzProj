@@ -23,7 +23,7 @@ CONFIG -= qt
 CONFIG += c++11
 
 #...PROJ Library
-PROJPATH      = $$PWD/../proj/proj5.1/src
+PROJPATH      = $$PWD/../thirdparty/proj/proj5.1/src
 
 #...PROJ Sources
 SOURCES_PROJ =    $$PROJPATH/nad_init.c                \
