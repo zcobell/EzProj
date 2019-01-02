@@ -23,7 +23,7 @@ CONFIG -= qt
 CONFIG += c++11
 
 #...PROJ Library
-PROJPATH      = $$PWD/../proj/proj5.1/src
+PROJPATH      = $$PWD/../thirdparty/proj/proj5.1/src
 
 #...PROJ Sources
 SOURCES_PROJ =    $$PROJPATH/nad_init.c                \
@@ -204,9 +204,9 @@ SOURCES_PROJ =    $$PROJPATH/nad_init.c                \
                   $$PROJPATH/pj_strtod.c
 
 HEADERS += epsg.h \
-    ezproj.h point.h
+    ezproj.h
 
 SOURCES += $$SOURCES_PROJ epsg.cpp \
-    ezproj.cpp point.cpp
+    ezproj.cpp
 
-INCLUDEPATH += $$PROJPATH $$PWD/../proj/proj5.1
+INCLUDEPATH += $$PROJPATH $$PWD/../thirdparty/proj/proj5.1

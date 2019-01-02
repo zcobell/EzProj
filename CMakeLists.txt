@@ -47,6 +47,32 @@ ENDIF(BUILD_SHARED)
 
 
 ###########################################################################
+# ABSEIL SWISS TABLES
+###########################################################################
+IF( ${CMAKE_SOURCE_DIR} EQUAL ${PROJECT_SOURCE_DIR} )
+    IF(NOT CYGWIN)
+        OPTION(USE_GOOGLE_FLAT_MAP "Use Google's hash table to increase speed" ON)
+        IF(USE_GOOGLE_FLAT_MAP)
+            if(MSVC)
+              # /wd4005  macro-redefinition
+              # /wd4068  unknown pragma
+              # /wd4244  conversion from 'type1' to 'type2'
+              # /wd4267  conversion from 'size_t' to 'type2'
+              # /wd4800  force value to bool 'true' or 'false' (performance warning)
+              add_compile_options(/wd4005 /wd4068 /wd4244 /wd4267 /wd4800)
+              add_definitions(/DNOMINMAX /DWIN32_LEAN_AND_MEAN=1 /D_CRT_SECURE_NO_WARNINGS)
+            endif(MSVC)
+            add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/abseil)
+            MESSAGE(STATUS "Using Google's Flat Map (from ABSL) instead of unordered_map for performance")
+        ENDIF(USE_GOOGLE_FLAT_MAP)    
+    ELSE(NOT CYGWIN)
+        SET(USE_GOOGLE_FLAT_MAP FALSE)
+    ENDIF(NOT CYGWIN)
+ENDIF(${CMAKE_SOURCE_DIR} EQUAL ${PROJECT_SOURCE_DIR} )
+###########################################################################
+
+
+###########################################################################
 # Enable running tests
 ###########################################################################
 IF(UNIX OR CYGWIN)
@@ -184,199 +210,200 @@ set(PACKAGE_TARNAME "proj")
 set(PACKAGE_URL "http://proj4.org")
 set(PACKAGE_VERSION "${${PROJECT_INTERN_NAME}_VERSION}")
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/proj_config.cmake.in ${CMAKE_BINARY_DIR}/CMakeFiles/pj_config/proj_config.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/proj_config.cmake.in ${CMAKE_BINARY_DIR}/CMakeFiles/pj_config/proj_config.h)
 ###########################################################################
 
 
 ###########################################################################
 #  PROJ 
 ###########################################################################
-ADD_LIBRARY( proj  STATIC ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/nad_init.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_aea.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_aeqd.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_airy.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_aitoff.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_august.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_axisswap.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_bacon.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_bipc.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_boggs.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_bonne.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_calcofi.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_cart.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_cass.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_cc.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_ccon.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_cea.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_chamb.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_collg.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_comill.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_crast.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_deformation.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_denoy.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_eck1.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_eck2.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_eck3.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_eck4.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_eck5.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_eqc.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_eqdc.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_fahey.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_fouc_s.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_gall.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_geoc.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_geos.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_gins8.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_gnom.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_gn_sinu.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_goode.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_gstmerc.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_hammer.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_hatano.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_helmert.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_hgridshift.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_horner.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_igh.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_isea.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_imw_p.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_krovak.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_labrd.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_laea.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_lagrng.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_larr.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_lask.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_latlong.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_lcca.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_lcc.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_loxim.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_lsat.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_misrsom.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_mbt_fps.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_mbtfpp.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_mbtfpq.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_merc.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_mill.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_mod_ster.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_moll.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_molodensky.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_natearth.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_natearth2.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_nell.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_nell_h.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_nocol.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_nsper.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_nzmg.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_ob_tran.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_ocea.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_oea.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_omerc.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_ortho.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_patterson.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_pipeline.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_poly.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_putp2.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_putp3.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_putp4p.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_putp5.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_putp6.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_qsc.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_robin.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_rpoly.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_sch.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_sconics.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_somerc.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_sterea.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_stere.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_sts.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_tcc.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_tcea.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_times.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_tmerc.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_tpeqd.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_unitconvert.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_urm5.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_urmfps.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_vandg.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_vandg2.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_vandg4.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_vgridshift.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_wag2.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_wag3.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_wag7.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_wink1.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_wink2.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/proj_etmerc.c 
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/aasincos.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/adjlon.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/bch2bps.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/bchgen.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/biveval.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/dmstor.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/emess.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/emess.h
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/geocent.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/geocent.h
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/geodesic.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/mk_cheby.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/nad_cvt.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/nad_init.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/nad_intr.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_apply_gridshift.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_apply_vgridshift.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_auth.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_ctx.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_fileapi.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_datum_set.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_datums.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_deriv.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_ell_set.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_ellps.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_errno.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_factors.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_fwd.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_gauss.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_gc_reader.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_geocent.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_gridcatalog.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_gridinfo.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_gridlist.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/PJ_healpix.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_init.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_initcache.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_inv.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_list.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_list.h
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_log.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_malloc.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_math.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_mlfn.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_msfn.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_mutex.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/proj_4D_api.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_internal.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/proj_internal.h
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_open_lib.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_param.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_phi2.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_pr_list.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_qsfn.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_release.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_strerrno.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_transform.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_tsfn.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_units.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_utils.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_zpoly1.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/proj_mdist.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/proj_math.h
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/proj_rouss.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/rtodms.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/vector1.c
-                            ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src/pj_strtod.c )
+ADD_LIBRARY( proj  STATIC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/nad_init.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_aea.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_aeqd.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_airy.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_aitoff.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_august.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_axisswap.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_bacon.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_bipc.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_boggs.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_bonne.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_calcofi.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_cart.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_cass.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_cc.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_ccon.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_cea.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_chamb.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_collg.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_comill.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_crast.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_deformation.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_denoy.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_eck1.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_eck2.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_eck3.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_eck4.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_eck5.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_eqc.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_eqdc.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_fahey.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_fouc_s.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_gall.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_geoc.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_geos.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_gins8.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_gnom.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_gn_sinu.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_goode.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_gstmerc.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_hammer.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_hatano.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_helmert.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_hgridshift.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_horner.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_igh.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_isea.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_imw_p.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_krovak.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_labrd.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_laea.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_lagrng.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_larr.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_lask.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_latlong.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_lcca.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_lcc.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_loxim.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_lsat.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_misrsom.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_mbt_fps.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_mbtfpp.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_mbtfpq.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_merc.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_mill.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_mod_ster.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_moll.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_molodensky.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_natearth.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_natearth2.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_nell.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_nell_h.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_nocol.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_nsper.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_nzmg.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_ob_tran.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_ocea.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_oea.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_omerc.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_ortho.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_patterson.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_pipeline.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_poly.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_putp2.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_putp3.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_putp4p.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_putp5.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_putp6.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_qsc.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_robin.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_rpoly.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_sch.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_sconics.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_somerc.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_sterea.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_stere.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_sts.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_tcc.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_tcea.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_times.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_tmerc.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_tpeqd.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_unitconvert.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_urm5.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_urmfps.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_vandg.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_vandg2.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_vandg4.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_vgridshift.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_wag2.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_wag3.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_wag7.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_wink1.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_wink2.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/proj_etmerc.c 
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/aasincos.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/adjlon.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/bch2bps.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/bchgen.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/biveval.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/dmstor.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/emess.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/emess.h
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/geocent.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/geocent.h
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/geodesic.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/mk_cheby.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/nad_cvt.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/nad_init.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/nad_intr.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_apply_gridshift.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_apply_vgridshift.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_auth.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_ctx.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_fileapi.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_datum_set.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_datums.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_deriv.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_ell_set.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_ellps.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_errno.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_factors.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_fwd.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_gauss.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_gc_reader.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_geocent.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_gridcatalog.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_gridinfo.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_gridlist.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/PJ_healpix.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_init.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_initcache.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_inv.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_list.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_list.h
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_log.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_malloc.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_math.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_mlfn.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_msfn.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_mutex.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/proj_4D_api.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_internal.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/proj_internal.h
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_open_lib.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_param.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_phi2.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_pr_list.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_qsfn.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_release.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_strerrno.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_transform.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_tsfn.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_units.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_utils.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_zpoly1.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/proj_mdist.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/proj_math.h
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/proj_rouss.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/rtodms.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/vector1.c
+                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src/pj_strtod.c )
 
 TARGET_INCLUDE_DIRECTORIES( proj PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src
                                 ${CMAKE_CURRENT_SOURCE_DIR}/src/
                                 ${CMAKE_BINARY_DIR}/CMakeFiles/pj_config )
+
 
 IF (C99_MATH)
   TARGET_COMPILE_DEFINITIONS (proj PRIVATE "HAVE_C99_MATH=1")
@@ -394,14 +421,18 @@ ENDIF()
 #  EZPROJ 
 ###########################################################################
 ADD_LIBRARY( ezproj ${LIBTYPE} ${CMAKE_CURRENT_SOURCE_DIR}/src/epsg.cpp
-                           ${CMAKE_CURRENT_SOURCE_DIR}/src/ezproj.cpp
-                           ${CMAKE_CURRENT_SOURCE_DIR}/src/point.cpp )
-TARGET_INCLUDE_DIRECTORIES( ezproj PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/proj/proj5.1/src
+                           ${CMAKE_CURRENT_SOURCE_DIR}/src/ezproj.cpp )
+TARGET_INCLUDE_DIRECTORIES( ezproj PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src
                            ${CMAKE_CURRENT_SOURCE_DIR}/src
                            ${CMAKE_BINARY_DIR}/CMakeFiles/pj_config )
-SET(HEADER_LIST ${CMAKE_CURRENT_SOURCE_DIR}/src/ezproj.h ${CMAKE_CURRENT_SOURCE_DIR}/src/point.h )
+SET(HEADER_LIST ${CMAKE_CURRENT_SOURCE_DIR}/src/ezproj.h ) 
 TARGET_LINK_LIBRARIES( ezproj proj )
 ADD_DEPENDENCIES( ezproj proj )
+IF(USE_GOOGLE_FLAT_MAP)
+    TARGET_LINK_LIBRARIES(ezproj absl::base absl::container absl::hash)
+    ADD_DEPENDENCIES(ezproj absl::base absl::container absl::hash)
+    TARGET_COMPILE_DEFINITIONS(ezproj PRIVATE USE_GOOGLE_FLAT_MAP )
+ENDIF(USE_GOOGLE_FLAT_MAP)
 SET(HEADER_DEST "include")
 SET_TARGET_PROPERTIES( ezproj PROPERTIES PUBLIC_HEADER "${HEADER_LIST}" ) 
 INSTALL(TARGETS ezproj ARCHIVE DESTINATION lib LIBRARY DESTINATION lib PUBLIC_HEADER DESTINATION include)
