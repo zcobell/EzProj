@@ -10,7 +10,6 @@
 # in a cross platform environment. 
 #
 ###########################################################################
-ENABLE_LANGUAGE(Fortran)
 ENABLE_LANGUAGE(C)
 ENABLE_LANGUAGE(CXX)
 INCLUDE (CheckIncludeFiles)
@@ -38,11 +37,15 @@ ENDIF()
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
 PROJECT(EZPROJ)
 OPTION(BUILD_SHARED "Build shared libraries" OFF)
+OPTION(BUILD_FORTRAN "Build Fortran libraries" OFF)
 IF(BUILD_SHARED)
     SET(LIBTYPE SHARED)
 ELSE(BUILD_SHARED)
     SET(LIBTYPE STATIC)
 ENDIF(BUILD_SHARED)
+IF(BUILD_FORTRAN)
+    ENABLE_LANGUAGE(Fortran)
+ENDIF(BUILD_FORTRAN)
 ###########################################################################
 
 
@@ -442,11 +445,13 @@ INSTALL(TARGETS ezproj ARCHIVE DESTINATION lib LIBRARY DESTINATION lib PUBLIC_HE
 ###########################################################################
 #  EZPROJ_FORTRAN 
 ###########################################################################
-ADD_LIBRARY( ezprojf ${LIBTYPE} ${CMAKE_CURRENT_SOURCE_DIR}/src/ezproj_fortran.cpp
-                             ${CMAKE_CURRENT_SOURCE_DIR}/src/ezproj_fortran.F90 )
-TARGET_INCLUDE_DIRECTORIES( ezprojf PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src )
-ADD_DEPENDENCIES( ezprojf ezproj )
-TARGET_LINK_LIBRARIES(ezprojf ezproj)
-SET_TARGET_PROPERTIES(ezprojf PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeFiles/mod/ezprojf)
-INSTALL(TARGETS ezprojf ARCHIVE DESTINATION lib LIBRARY DESTINATION lib)
+IF(BUILD_FORTRAN)
+    ADD_LIBRARY( ezprojf ${LIBTYPE} ${CMAKE_CURRENT_SOURCE_DIR}/src/ezproj_fortran.cpp
+                                 ${CMAKE_CURRENT_SOURCE_DIR}/src/ezproj_fortran.F90 )
+    TARGET_INCLUDE_DIRECTORIES( ezprojf PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src )
+    ADD_DEPENDENCIES( ezprojf ezproj )
+    TARGET_LINK_LIBRARIES(ezprojf ezproj)
+    SET_TARGET_PROPERTIES(ezprojf PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeFiles/mod/ezprojf)
+    INSTALL(TARGETS ezprojf ARCHIVE DESTINATION lib LIBRARY DESTINATION lib)
+ENDIF(BUILD_FORTRAN)
 ###########################################################################
