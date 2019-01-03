@@ -49,10 +49,9 @@ Ezproj::Ezproj() { this->_initialize(); }
  * Function to execute a coordinate system transformation using Proj4
  *
  **/
-int Ezproj::transform(int inputEPSG, int outputEPSG,
-                      std::pair<double, double> &input,
-                      std::pair<double, double> &output, bool &isLatLon) {
-  std::vector<std::pair<double, double>> in, out;
+int Ezproj::transform(int inputEPSG, int outputEPSG, Point &input,
+                      Point &output, bool &isLatLon) {
+  std::vector<Point> in, out;
   in.push_back(input);
   int ierr = this->transform(inputEPSG, outputEPSG, in, out, isLatLon);
   if (ierr != Ezproj::NoError) return ierr;
@@ -62,7 +61,7 @@ int Ezproj::transform(int inputEPSG, int outputEPSG,
 
 int Ezproj::transform(int inputEPSG, int outputEPSG, double x, double y,
                       double &outx, double &outy, bool &isLatLon) {
-  std::pair<double, double> in(x, y), out;
+  Point in(x, y), out;
   int ierr = this->transform(inputEPSG, outputEPSG, in, out, isLatLon);
   if (ierr != Ezproj::NoError) return ierr;
   outx = out.first;
@@ -84,10 +83,8 @@ int Ezproj::transform(int inputEPSG, int outputEPSG, double x, double y,
  * Function to execute a coordinate system transformation using Proj4
  *
  **/
-int Ezproj::transform(int inputEPSG, int outputEPSG,
-                      std::vector<std::pair<double, double>> &input,
-                      std::vector<std::pair<double, double>> &output,
-                      bool &isLatLon) {
+int Ezproj::transform(int inputEPSG, int outputEPSG, std::vector<Point> &input,
+                      std::vector<Point> &output, bool &isLatLon) {
   assert(input.size() > 0);
   if (input.size() <= 0) return Ezproj::NoData;
 
@@ -151,7 +148,7 @@ bool Ezproj::containsEpsg(int epsg) {
 
 int Ezproj::cpp(double lambda0, double phi0, double x, double y, double &outx,
                 double &outy) {
-  std::pair<double, double> i(x, y), o;
+  Point i(x, y), o;
   int ierr = Ezproj::cpp(lambda0, phi0, i, o);
   if (ierr != Ezproj::NoError) return ierr;
   outx = o.first;
@@ -159,18 +156,16 @@ int Ezproj::cpp(double lambda0, double phi0, double x, double y, double &outx,
   return Ezproj::NoError;
 }
 
-int Ezproj::cpp(double lambda0, double phi0, std::pair<double, double> &input,
-                std::pair<double, double> &output) {
-  std::vector<std::pair<double, double>> in, out;
+int Ezproj::cpp(double lambda0, double phi0, Point &input, Point &output) {
+  std::vector<Point> in, out;
   in.push_back(input);
   int ierr = Ezproj::cpp(lambda0, phi0, in, out);
   if (ierr == Ezproj::NoError) output = out.at(0);
   return ierr;
 }
 
-int Ezproj::cpp(double lambda0, double phi0,
-                std::vector<std::pair<double, double>> &input,
-                std::vector<std::pair<double, double>> &output) {
+int Ezproj::cpp(double lambda0, double phi0, std::vector<Point> &input,
+                std::vector<Point> &output) {
   assert(input.size() > 0);
   if (input.size() <= 0) return Ezproj::NoData;
 
@@ -181,14 +176,14 @@ int Ezproj::cpp(double lambda0, double phi0,
   for (auto &p : input) {
     double x = r * (s_torad * p.first - slam0) * cos(sfea0);
     double y = r * (s_torad * p.second);
-    output.push_back(std::pair<double, double>(x, y));
+    output.push_back(Point(x, y));
   }
   return Ezproj::NoError;
 }
 
 int Ezproj::inverseCpp(double lambda0, double phi0, double x, double y,
                        double &outx, double &outy) {
-  std::pair<double, double> i(x, y), o;
+  Point i(x, y), o;
   int ierr = Ezproj::inverseCpp(lambda0, phi0, i, o);
   if (ierr != Ezproj::NoError) return ierr;
   outx = o.first;
@@ -196,19 +191,17 @@ int Ezproj::inverseCpp(double lambda0, double phi0, double x, double y,
   return Ezproj::NoError;
 }
 
-int Ezproj::inverseCpp(double lambda0, double phi0,
-                       std::pair<double, double> &input,
-                       std::pair<double, double> &output) {
-  std::vector<std::pair<double, double>> in, out;
+int Ezproj::inverseCpp(double lambda0, double phi0, Point &input,
+                       Point &output) {
+  std::vector<Point> in, out;
   in.push_back(input);
   int ierr = Ezproj::inverseCpp(lambda0, phi0, in, out);
   if (ierr == Ezproj::NoError) output = out.at(0);
   return ierr;
 }
 
-int Ezproj::inverseCpp(double lambda0, double phi0,
-                       std::vector<std::pair<double, double>> &input,
-                       std::vector<std::pair<double, double>> &output) {
+int Ezproj::inverseCpp(double lambda0, double phi0, std::vector<Point> &input,
+                       std::vector<Point> &output) {
   assert(input.size() > 0);
   if (input.size() <= 0) return Ezproj::NoData;
 
@@ -219,7 +212,7 @@ int Ezproj::inverseCpp(double lambda0, double phi0,
   for (auto &p : input) {
     double x = s_todeg * (slam0 + p.first / (r * cos(sfea0)));
     double y = s_todeg * (p.second / r);
-    output.push_back(std::pair<double, double>(x, y));
+    output.push_back(Point(x, y));
   }
   return Ezproj::NoError;
 }

@@ -42,6 +42,8 @@
 #include <unordered_map>
 #endif
 
+using Point = std::pair<double, double>;
+
 class Ezproj {
  public:
   enum _errors { NoError, NoSuchProjection, NoData, Proj4InternalError };
@@ -53,12 +55,11 @@ class Ezproj {
   int transform(int inputEPSG, int outputEPSG, double x, double y, double &outx,
                 double &outy, bool &isLatLon);
 
-  int transform(int inputEPSG, int outputEPSG, std::pair<double, double> &input,
-                std::pair<double, double> &output, bool &isLatLon);
+  int transform(int inputEPSG, int outputEPSG, Point &input, Point &output,
+                bool &isLatLon);
 
-  int transform(int inputEPSG, int outputEPSG,
-                std::vector<std::pair<double, double>> &input,
-                std::vector<std::pair<double, double>> &output, bool &isLatLon);
+  int transform(int inputEPSG, int outputEPSG, std::vector<Point> &input,
+                std::vector<Point> &output, bool &isLatLon);
 
   std::string description(int epsg);
   std::string projInitializationString(int epsg);
@@ -67,20 +68,16 @@ class Ezproj {
 
   static int cpp(double lambda0, double phi0, double x, double y, double &outx,
                  double &outy);
-  static int cpp(double lambda0, double phi0, std::pair<double, double> &input,
-                 std::pair<double, double> &output);
-  static int cpp(double lambda0, double phi0,
-                 std::vector<std::pair<double, double>> &input,
-                 std::vector<std::pair<double, double>> &output);
+  static int cpp(double lambda0, double phi0, Point &input, Point &output);
+  static int cpp(double lambda0, double phi0, std::vector<Point> &input,
+                 std::vector<Point> &output);
 
   static int inverseCpp(double lambda0, double phi0, double x, double y,
                         double &outx, double &outy);
-  static int inverseCpp(double lambda0, double phi0,
-                        std::pair<double, double> &input,
-                        std::pair<double, double> &output);
-  static int inverseCpp(double lambda0, double phi0,
-                        std::vector<std::pair<double, double>> &input,
-                        std::vector<std::pair<double, double>> &output);
+  static int inverseCpp(double lambda0, double phi0, Point &input,
+                        Point &output);
+  static int inverseCpp(double lambda0, double phi0, std::vector<Point> &input,
+                        std::vector<Point> &output);
 
  private:
   void _initialize();
