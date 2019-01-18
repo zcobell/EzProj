@@ -438,5 +438,8 @@ IF(EZPROJ_BUILD_FORTRAN)
     TARGET_LINK_LIBRARIES(ezprojf ezproj)
     SET_TARGET_PROPERTIES(ezprojf PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeFiles/mod/ezprojf)
     INSTALL(TARGETS ezprojf ARCHIVE DESTINATION lib LIBRARY DESTINATION lib)
+    INSTALL ( CODE
+  "EXECUTE_PROCESS (COMMAND \"${CMAKE_COMMAND}\" -E copy_directory \"${CMAKE_BINARY_DIR}/CMakeFiles/mod/ezprojf\" \"${CMAKE_INSTALL_PREFIX}/include\")"
+    )
 ENDIF(EZPROJ_BUILD_FORTRAN)
 ###########################################################################
