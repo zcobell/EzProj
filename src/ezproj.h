@@ -35,12 +35,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-
-#ifdef USE_GOOGLE_FLAT_MAP
-#include "absl/container/flat_hash_map.h"
-#else
 #include <unordered_map>
-#endif
 
 using Point = std::pair<double, double>;
 
@@ -91,12 +86,8 @@ class Ezproj {
 
   const std::vector<const char *> *m_epsgDescriptions;
   const std::vector<const char *> *m_epsgInit;
-
-#ifdef USE_GOOGLE_FLAT_MAP
-  const absl::flat_hash_map<int, size_t> *m_epsgMapping;
-#else
   const std::unordered_map<int, size_t> *m_epsgMapping;
-#endif
+
 };
 
 #endif  // EZPROJ_H

@@ -18,11 +18,7 @@
 //------------------------------------------------------------------------//
 #include "ezproj.h"
 
-#ifdef USE_GOOGLE_FLAT_MAP
-static const absl::flat_hash_map<int, size_t> s_epsgMapping {
-#else
-static const std::unordered_map<int, size_t> s_epsgMapping {
-#endif
+static const std::unordered_map<int, size_t> s_epsgMapping{
     {2000, 0},      {2001, 1},      {2002, 2},      {2003, 3},
     {2004, 4},      {2005, 5},      {2006, 6},      {2007, 7},
     {2008, 8},      {2009, 9},      {2010, 10},     {2011, 11},

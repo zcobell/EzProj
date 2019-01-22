@@ -68,32 +68,6 @@ ENDIF(COVERAGE)
 
 
 ###########################################################################
-# ABSEIL SWISS TABLES
-###########################################################################
-IF( ${CMAKE_SOURCE_DIR} EQUAL ${PROJECT_SOURCE_DIR} )
-    IF(NOT CYGWIN)
-        OPTION(USE_GOOGLE_FLAT_MAP "Use Google's hash table to increase speed" ON)
-        IF(USE_GOOGLE_FLAT_MAP)
-            if(MSVC)
-              # /wd4005  macro-redefinition
-              # /wd4068  unknown pragma
-              # /wd4244  conversion from 'type1' to 'type2'
-              # /wd4267  conversion from 'size_t' to 'type2'
-              # /wd4800  force value to bool 'true' or 'false' (performance warning)
-              add_compile_options(/wd4005 /wd4068 /wd4244 /wd4267 /wd4800)
-              add_definitions(/DNOMINMAX /DWIN32_LEAN_AND_MEAN=1 /D_CRT_SECURE_NO_WARNINGS)
-            endif(MSVC)
-            add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/abseil)
-            MESSAGE(STATUS "Using Google's Flat Map (from ABSL) instead of unordered_map for performance")
-        ENDIF(USE_GOOGLE_FLAT_MAP)    
-    ELSE(NOT CYGWIN)
-        SET(USE_GOOGLE_FLAT_MAP FALSE)
-    ENDIF(NOT CYGWIN)
-ENDIF(${CMAKE_SOURCE_DIR} EQUAL ${PROJECT_SOURCE_DIR} )
-###########################################################################
-
-
-###########################################################################
 # Enable running tests
 ###########################################################################
 IF(UNIX OR CYGWIN)
@@ -435,11 +409,6 @@ TARGET_INCLUDE_DIRECTORIES( ezproj PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdpart
 SET(HEADER_LIST ${CMAKE_CURRENT_SOURCE_DIR}/src/ezproj.h ) 
 TARGET_LINK_LIBRARIES( ezproj proj )
 ADD_DEPENDENCIES( ezproj proj )
-IF(USE_GOOGLE_FLAT_MAP)
-    TARGET_LINK_LIBRARIES(ezproj absl::base absl::container absl::hash)
-    ADD_DEPENDENCIES(ezproj absl::base absl::container absl::hash)
-    TARGET_COMPILE_DEFINITIONS(ezproj PRIVATE USE_GOOGLE_FLAT_MAP )
-ENDIF(USE_GOOGLE_FLAT_MAP)
 SET(HEADER_DEST "include")
 SET_TARGET_PROPERTIES( ezproj PROPERTIES PUBLIC_HEADER "${HEADER_LIST}" ) 
 INSTALL(TARGETS ezproj ARCHIVE DESTINATION lib LIBRARY DESTINATION lib PUBLIC_HEADER DESTINATION include)
