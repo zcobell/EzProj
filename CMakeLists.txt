@@ -74,6 +74,7 @@ ENDIF(NOT CYGWIN)
 # Enable running tests
 ###########################################################################
 IF(UNIX OR CYGWIN)
+    OPTION(BUILD_TESTS "Build test cases" OFF)
     ENABLE_TESTING()
 ENDIF(UNIX OR CYGWIN)
 ###########################################################################
@@ -448,3 +449,41 @@ TARGET_LINK_LIBRARIES(ezprojf ezproj)
 SET_TARGET_PROPERTIES(ezprojf PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeFiles/mod/ezprojf)
 INSTALL(TARGETS ezprojf ARCHIVE DESTINATION lib LIBRARY DESTINATION lib)
 ###########################################################################
+
+
+###########################################################################
+# Test Cases
+###########################################################################
+IF(UNIX OR CYGWIN)
+    IF(BUILD_TESTS)
+        #...C++ Testing
+        FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/cxx_tests)
+
+        SET(TEST_LIST cxx_toUtm15.cpp cxx_toGeographic.cpp )
+
+        FOREACH(TESTFILE ${TEST_LIST} ) 
+            GET_FILENAME_COMPONENT( TESTNAME ${TESTFILE} NAME_WE )
+            ADD_EXECUTABLE( ${TESTNAME} ${CMAKE_SOURCE_DIR}/testing/cxx_tests/${TESTFILE} )
+            ADD_DEPENDENCIES( ${TESTNAME} ezproj )
+            TARGET_INCLUDE_DIRECTORIES( ${TESTNAME} PRIVATE ${CMAKE_SOURCE_DIR}/src 
+                                                            ${CMAKE_SOURCE_DIR}/thirdparty/EzProj/src 
+                                                            ${CMAKE_SOURCE_DIR}/libraries/kdtree2 
+                                                            ${CMAKE_SOURCE_DIR}/libraries/constants 
+                                                            ${CMAKE_SOURCE_DIR}/libraries/rasterdata )
+            TARGET_LINK_LIBRARIES( ${TESTNAME} ezproj )
+            SET_TARGET_PROPERTIES( ${TESTNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/cxx_tests )
+    
+            ADD_TEST( NAME TEST_${TESTNAME} COMMAND ${CMAKE_BINARY_DIR}/cxx_tests/${TESTNAME}
+                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/testing )
+            IF(CYGWIN)
+               SET_TESTS_PROPERTIES( TEST_${TESTNAME} PROPERTIES ENVIRONMENT "PATH=$ENV{PATH}:${CMAKE_BINARY_DIR}")
+            ELSE(CYGWIN)
+               SET_TESTS_PROPERTIES( TEST_${TESTNAME} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=$ENV{LD_LIBRARY_PATH}:${CMAKE_BINARY_DIR}")
+            ENDIF(CYGWIN)
+        ENDFOREACH()
+   ENDIF(BUILD_TESTS)
+        
+ENDIF(UNIX OR CYGWIN)
+###########################################################################
+
+
