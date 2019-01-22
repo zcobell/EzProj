@@ -23,8 +23,6 @@
 
 int main() {
 
-    Ezproj p;
-    std::cout << "INFO: Using proj version: " << p.projVersion() << std::endl;
 
 
     //...Project a single point
@@ -37,6 +35,18 @@ int main() {
     const int cs2 = 26915;
     double x_utm15,y_utm15;
     bool isLatLon;
+    
+    Ezproj p;
+    
+    bool hasCs = p.containsEpsg(4326);
+    if(!hasCs){
+        std::cout << "Could not find coordinate system wgs84" << std::endl;
+        return 1;
+    }
+    
+    std::cout << "INFO: Using proj version: " << p.projVersion() << std::endl;
+    std::cout << "INFO: Projecting from: " << p.description(4326) << std::endl;
+    std::cout << "INFO: Projection to: " << p.description(26915) << std::endl;
 
     p.transform(cs1,cs2,x_original,y_original,x_utm15,y_utm15,isLatLon);
 

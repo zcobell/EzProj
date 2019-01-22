@@ -59,6 +59,9 @@ IF(COVERAGE)
         INCLUDE(CodeCoverage)
         setup_target_for_coverage(adcmoduels_coverage tests coverage)
         SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -pthread -g -O0 -fprofile-arcs -ftest-coverage")
+        IF(EZPROJ_BUILD_FORTRAN)
+            SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage")
+        ENDIF(EZPROJ_BUILD_FORTRAN)
     ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 ENDIF(COVERAGE)
 ###########################################################################
@@ -448,7 +451,7 @@ INSTALL(TARGETS ezproj ARCHIVE DESTINATION lib LIBRARY DESTINATION lib PUBLIC_HE
 ###########################################################################
 IF(EZPROJ_BUILD_FORTRAN)
     ADD_LIBRARY( ezprojf ${LIBTYPE} ${CMAKE_CURRENT_SOURCE_DIR}/src/ezproj_fortran.cpp
-                                 ${CMAKE_CURRENT_SOURCE_DIR}/src/ezproj_fortran.F90 )
+                                    ${CMAKE_CURRENT_SOURCE_DIR}/src/ezproj_fortran.F90 )
     TARGET_INCLUDE_DIRECTORIES( ezprojf PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src )
     ADD_DEPENDENCIES( ezprojf ezproj )
     TARGET_LINK_LIBRARIES(ezprojf ezproj)
@@ -487,6 +490,30 @@ IF(UNIX OR CYGWIN)
                SET_TESTS_PROPERTIES( TEST_${TESTNAME} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=$ENV{LD_LIBRARY_PATH}:${CMAKE_BINARY_DIR}")
             ENDIF(CYGWIN)
         ENDFOREACH()
+        
+        #...Fortran Testing
+        IF(EZPROJ_BUILD_FORTRAN)
+            FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/fortran_tests)
+
+            SET(TEST_LIST f90_toUtm15.F90 f90_toGeographic.F90 ) 
+
+            FOREACH(TESTFILE ${TEST_LIST} ) 
+                GET_FILENAME_COMPONENT( TESTNAME ${TESTFILE} NAME_WE )
+                ADD_EXECUTABLE( ${TESTNAME} ${CMAKE_SOURCE_DIR}/testing/fortran_tests/${TESTFILE} )
+                ADD_DEPENDENCIES( ${TESTNAME} ezproj ezprojf )
+                TARGET_INCLUDE_DIRECTORIES( ${TESTNAME} PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_BINARY_DIR}/CMakeFiles/mod/ezprojf )
+                TARGET_LINK_LIBRARIES( ${TESTNAME} ezproj ezprojf )
+                SET_TARGET_PROPERTIES( ${TESTNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/fortran_tests )
+    
+                ADD_TEST( NAME TEST_${TESTNAME} COMMAND ${CMAKE_BINARY_DIR}/fortran_tests/${TESTNAME}
+                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/testing )
+                IF(CYGWIN)
+                   SET_TESTS_PROPERTIES( TEST_${TESTNAME} PROPERTIES ENVIRONMENT "PATH=$ENV{PATH}:${CMAKE_BINARY_DIR}")
+                ELSE(CYGWIN)
+                   SET_TESTS_PROPERTIES( TEST_${TESTNAME} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=$ENV{LD_LIBRARY_PATH}:${CMAKE_BINARY_DIR}")
+                ENDIF(CYGWIN)
+            ENDFOREACH()
+        ENDIF(EZPROJ_BUILD_FORTRAN)
    ENDIF(BUILD_TESTS)
         
 ENDIF(UNIX OR CYGWIN)
