@@ -469,17 +469,13 @@ IF(UNIX OR CYGWIN)
         #...C++ Testing
         FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/cxx_tests)
 
-        SET(TEST_LIST cxx_toUtm15.cpp cxx_toGeographic.cpp )
+        SET(TEST_LIST cxx_toUtm15.cpp cxx_toGeographic.cpp cxx_cpp.cpp cxx_invcpp.cpp )
 
         FOREACH(TESTFILE ${TEST_LIST} ) 
             GET_FILENAME_COMPONENT( TESTNAME ${TESTFILE} NAME_WE )
             ADD_EXECUTABLE( ${TESTNAME} ${CMAKE_SOURCE_DIR}/testing/cxx_tests/${TESTFILE} )
             ADD_DEPENDENCIES( ${TESTNAME} ezproj )
-            TARGET_INCLUDE_DIRECTORIES( ${TESTNAME} PRIVATE ${CMAKE_SOURCE_DIR}/src 
-                                                            ${CMAKE_SOURCE_DIR}/thirdparty/EzProj/src 
-                                                            ${CMAKE_SOURCE_DIR}/libraries/kdtree2 
-                                                            ${CMAKE_SOURCE_DIR}/libraries/constants 
-                                                            ${CMAKE_SOURCE_DIR}/libraries/rasterdata )
+            TARGET_INCLUDE_DIRECTORIES( ${TESTNAME} PRIVATE ${CMAKE_SOURCE_DIR}/src )
             TARGET_LINK_LIBRARIES( ${TESTNAME} ezproj )
             SET_TARGET_PROPERTIES( ${TESTNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/cxx_tests )
     
