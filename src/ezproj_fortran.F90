@@ -45,6 +45,20 @@
                    REAL(C_DOUBLE),INTENT(IN)    :: x,y
                    REAL(C_DOUBLE),INTENT(OUT)   :: out_x,out_y
                END SUBROUTINE c_ezproj_project
+               SUBROUTINE c_ezproj_cpp(lambda0,phi0,x,y,out_x,out_y,ierr) BIND(C,NAME="ezproj_cpp_")
+                   USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_INT,C_DOUBLE
+                   IMPLICIT NONE
+                   REAL(C_DOUBLE),INTENT(IN)    :: lambda0,phi0,x,y
+                   REAL(C_DOUBLE),INTENT(OUT)   :: out_x,out_y
+                   INTEGER(C_INT),INTENT(OUT)   :: ierr
+               END SUBROUTINE c_ezproj_cpp
+               SUBROUTINE c_ezproj_inverseCpp(lambda0,phi0,x,y,out_x,out_y,ierr) BIND(C,NAME="ezproj_inverseCpp_")
+                   USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_INT,C_DOUBLE
+                   IMPLICIT NONE
+                   REAL(C_DOUBLE),INTENT(IN)    :: lambda0,phi0,x,y
+                   REAL(C_DOUBLE),INTENT(OUT)   :: out_x,out_y
+                   INTEGER(C_INT),INTENT(OUT)   :: ierr
+               END SUBROUTINE c_ezproj_inverseCpp
            END INTERFACE
 
            CONTAINS
@@ -62,7 +76,7 @@
            SUBROUTINE ezproj_project(pj,epsg_from,epsg_to,x,y,out_x,out_y,ierr)
                USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_INT,C_DOUBLE,C_PTR
                IMPLICIT NONE
-               TYPE(EZPROJ),INTENT(INOUT)    :: pj
+               TYPE(EZPROJ),INTENT(INOUT)   :: pj
                INTEGER,INTENT(IN)           :: epsg_from
                INTEGER,INTENT(IN)           :: epsg_to
                REAL(8),INTENT(IN)           :: x
@@ -112,5 +126,48 @@
                RETURN
 
            END SUBROUTINE ezproj_delete
+
+           SUBROUTINE ezproj_cpp(lambda0,phi0,x,y,out_x,out_y,ierr)
+               USE,INTRINSIC :: ISO_C_BINDING,ONLY: C_INT,C_DOUBLE
+               IMPLICIT NONE
+               REAL(8),INTENT(IN)  :: lambda0, phi0, x, y
+               REAL(8),INTENT(OUT) :: out_x, out_y
+               INTEGER,INTENT(OUT) :: ierr
+
+               REAL(C_DOUBLE)      :: c_x,c_y,c_xout,c_yout,c_lambda0,c_phi0
+               INTEGER(C_INT)      :: c_ierr
+
+               c_x = REAL(x,C_DOUBLE)
+               c_y = REAL(y,c_DOUBLE)
+               c_lambda0 = REAL(lambda0,C_DOUBLE)
+               c_phi0 = REAL(phi0,C_DOUBLE)
+
+               CALL c_ezproj_cpp(c_lambda0,c_phi0,c_x,c_y,c_xout,c_yout,c_ierr)
+
+               out_x = REAL(c_xout,C_DOUBLE)
+               out_y = REAL(c_yout,C_DOUBLE)
+           END SUBROUTINE ezproj_cpp
+           
+           SUBROUTINE ezproj_inversecpp(lambda0,phi0,x,y,out_x,out_y,ierr)
+               USE,INTRINSIC :: ISO_C_BINDING,ONLY: C_INT,C_DOUBLE
+               IMPLICIT NONE
+               REAL(8),INTENT(IN)  :: lambda0, phi0, x, y
+               REAL(8),INTENT(OUT) :: out_x, out_y
+               INTEGER,INTENT(OUT) :: ierr
+
+               REAL(C_DOUBLE)      :: c_x,c_y,c_xout,c_yout,c_lambda0,c_phi0
+               INTEGER(C_INT)      :: c_ierr
+
+               c_x = REAL(x,C_DOUBLE)
+               c_y = REAL(y,c_DOUBLE)
+               c_lambda0 = REAL(lambda0,C_DOUBLE)
+               c_phi0 = REAL(phi0,C_DOUBLE)
+
+               CALL c_ezproj_inversecpp(c_lambda0,c_phi0,c_x,c_y,c_xout,c_yout,c_ierr)
+
+               out_x = REAL(c_xout,C_DOUBLE)
+               out_y = REAL(c_yout,C_DOUBLE)
+           END SUBROUTINE ezproj_inversecpp
+
 
        END MODULE EZPROJMODULE

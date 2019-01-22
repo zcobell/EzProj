@@ -23,6 +23,10 @@ void *ezproj_create_();
 void ezproj_delete_(void *ptr);
 void ezproj_project_(void *ptr, int *epsg_from, int *epsg_to, double *x,
                      double *y, double *out_x, double *out_y, int *ierr);
+void ezproj_cpp_(double *lambda0, double *phi0, double *x, double *y,
+                 double *out_x, double *out_y, int *ierr);
+void ezproj_inverseCpp_(double *lambda0, double *phi0, double *x, double *y,
+                        double *out_x, double *out_y, int *ierr);
 }
 
 void *ezproj_create_() {
@@ -44,4 +48,15 @@ void ezproj_project_(void *ptr, int *epsg_from, int *epsg_to, double *x,
   *ierr = transformer->transform(*(epsg_from), *(epsg_to), *(x), *(y), *(out_x),
                                  *(out_y), isLatLon);
   return;
+}
+
+void ezproj_cpp_(double *lambda0, double *phi0, double *x, double *y,
+                 double *out_x, double *out_y, int *ierr) {
+  *ierr = Ezproj::cpp(*(lambda0), *(phi0), *(x), *(y), *(out_x), *(out_y));
+}
+
+void ezproj_inverseCpp_(double *lambda0, double *phi0, double *x, double *y,
+                        double *out_x, double *out_y, int *ierr) {
+  *ierr =
+      Ezproj::inverseCpp(*(lambda0), *(phi0), *(x), *(y), *(out_x), *(out_y));
 }

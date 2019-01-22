@@ -464,7 +464,7 @@ IF(UNIX OR CYGWIN)
         IF(EZPROJ_BUILD_FORTRAN)
             FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/fortran_tests)
 
-            SET(TEST_LIST f90_toUtm15.F90 f90_toGeographic.F90 ) 
+            SET(TEST_LIST f90_toUtm15.F90 f90_toGeographic.F90 f90_cpp.F90 f90_invcpp.F90 ) 
 
             FOREACH(TESTFILE ${TEST_LIST} ) 
                 GET_FILENAME_COMPONENT( TESTNAME ${TESTFILE} NAME_WE )

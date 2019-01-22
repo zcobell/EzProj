@@ -207,6 +207,7 @@ HEADERS += epsg.h \
     ezproj.h
 
 SOURCES += $$SOURCES_PROJ epsg.cpp \
-    ezproj.cpp
+    ezproj.cpp \
+    ezproj_fortran.cpp
 
 INCLUDEPATH += $$PROJPATH $$PWD/../thirdparty/proj/proj5.1
