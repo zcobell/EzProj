@@ -50,6 +50,21 @@ ENDIF(EZPROJ_BUILD_FORTRAN)
 
 
 ###########################################################################
+# Enable Coverage
+###########################################################################
+#OPTION(COVERAGE "Export Code Coverage report from tests" OFF)
+SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules)
+IF(COVERAGE)
+    IF(CMAKE_COMPILER_IS_GNUCXX) 
+        INCLUDE(CodeCoverage)
+        setup_target_for_coverage(adcmoduels_coverage tests coverage)
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -pthread -g -O0 -fprofile-arcs -ftest-coverage")
+    ENDIF(CMAKE_COMPILER_IS_GNUCXX)
+ENDIF(COVERAGE)
+###########################################################################
+
+
+###########################################################################
 # ABSEIL SWISS TABLES
 ###########################################################################
 IF( ${CMAKE_SOURCE_DIR} EQUAL ${PROJECT_SOURCE_DIR} )
