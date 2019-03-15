@@ -71,7 +71,7 @@ ENDIF(COVERAGE)
 # Enable running tests
 ###########################################################################
 IF(UNIX OR CYGWIN)
-    OPTION(BUILD_TESTS "Build test cases" OFF)
+    OPTION(EZPROJ_BUILD_TESTS "Build test cases" OFF)
     ENABLE_TESTING()
 ENDIF(UNIX OR CYGWIN)
 ###########################################################################
@@ -445,7 +445,7 @@ ENDIF(EZPROJ_BUILD_FORTRAN)
 # Test Cases
 ###########################################################################
 IF(UNIX OR CYGWIN)
-    IF(BUILD_TESTS)
+    IF(EZPROJ_BUILD_TESTS)
         #...C++ Testing
         FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/cxx_tests)
 
@@ -491,7 +491,7 @@ IF(UNIX OR CYGWIN)
                 ENDIF(CYGWIN)
             ENDFOREACH()
         ENDIF(EZPROJ_BUILD_FORTRAN)
-   ENDIF(BUILD_TESTS)
+    ENDIF(EZPROJ_BUILD_TESTS)
         
 ENDIF(UNIX OR CYGWIN)
 ###########################################################################
