@@ -36,13 +36,13 @@ ENDIF()
 ###########################################################################
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
 PROJECT(EZPROJ)
-OPTION(BUILD_SHARED "Build shared libraries" OFF)
+OPTION(EZPROJ_BUILD_SHARED "Build shared libraries" OFF)
 OPTION(EZPROJ_BUILD_FORTRAN "Build Fortran libraries" OFF)
-IF(BUILD_SHARED)
-    SET(LIBTYPE SHARED)
-ELSE(BUILD_SHARED)
-    SET(LIBTYPE STATIC)
-ENDIF(BUILD_SHARED)
+IF(EZPROJ_BUILD_SHARED)
+    SET(EZPROJ_LIBTYPE SHARED)
+ELSE(EZPROJ_BUILD_SHARED)
+    SET(EZPROJ_LIBTYPE STATIC)
+ENDIF(EZPROJ_BUILD_SHARED)
 IF(EZPROJ_BUILD_FORTRAN)
     ENABLE_LANGUAGE(Fortran)
 ENDIF(EZPROJ_BUILD_FORTRAN)
@@ -401,7 +401,7 @@ ENDIF()
 ###########################################################################
 #  EZPROJ 
 ###########################################################################
-ADD_LIBRARY( ezproj ${LIBTYPE} ${CMAKE_CURRENT_SOURCE_DIR}/src/epsg.cpp
+ADD_LIBRARY( ezproj ${EZPROJ_LIBTYPE} ${CMAKE_CURRENT_SOURCE_DIR}/src/epsg.cpp
                            ${CMAKE_CURRENT_SOURCE_DIR}/src/ezproj.cpp )
 TARGET_INCLUDE_DIRECTORIES( ezproj PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/proj/proj5.1/src
                            ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -411,11 +411,11 @@ TARGET_LINK_LIBRARIES( ezproj proj )
 ADD_DEPENDENCIES( ezproj proj )
 SET(HEADER_DEST "include")
 SET_TARGET_PROPERTIES( ezproj PROPERTIES PUBLIC_HEADER "${HEADER_LIST}" ) 
-IF(BUILD_SHARED)
+IF(EZPROJ_BUILD_SHARED)
     INSTALL(TARGETS ezproj RUNTIME DESTINATION lib LIBRARY DESTINATION lib PUBLIC_HEADER DESTINATION include)
-ELSE(BUILD_SHARED)
+ELSE(EZPROJ_BUILD_SHARED)
     INSTALL(TARGETS ezproj ARCHIVE DESTINATION lib LIBRARY DESTINATION lib PUBLIC_HEADER DESTINATION include)
-ENDIF(BUILD_SHARED)
+ENDIF(EZPROJ_BUILD_SHARED)
 ###########################################################################
 
 
@@ -423,17 +423,17 @@ ENDIF(BUILD_SHARED)
 #  EZPROJ_FORTRAN 
 ###########################################################################
 IF(EZPROJ_BUILD_FORTRAN)
-    ADD_LIBRARY( ezprojf ${LIBTYPE} ${CMAKE_CURRENT_SOURCE_DIR}/src/ezproj_fortran.cpp
+    ADD_LIBRARY( ezprojf ${EZPROJ_LIBTYPE} ${CMAKE_CURRENT_SOURCE_DIR}/src/ezproj_fortran.cpp
                                     ${CMAKE_CURRENT_SOURCE_DIR}/src/ezproj_fortran.F90 )
     TARGET_INCLUDE_DIRECTORIES( ezprojf PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src )
     ADD_DEPENDENCIES( ezprojf ezproj )
     TARGET_LINK_LIBRARIES(ezprojf ezproj)
     SET_TARGET_PROPERTIES(ezprojf PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeFiles/mod/ezprojf)
-    IF(BUILD_SHARED)
+    IF(EZPROJ_BUILD_SHARED)
         INSTALL(TARGETS ezprojf RUNTIME DESTINATION lib LIBRARY DESTINATION lib)
-    ELSE(BUILD_SHARED)
+    ELSE(EZPROJ_BUILD_SHARED)
         INSTALL(TARGETS ezprojf ARCHIVE DESTINATION lib LIBRARY DESTINATION lib)
-    ENDIF(BUILD_SHARED)
+    ENDIF(EZPROJ_BUILD_SHARED)
     INSTALL ( CODE
   "EXECUTE_PROCESS (COMMAND \"${CMAKE_COMMAND}\" -E copy_directory \"${CMAKE_BINARY_DIR}/CMakeFiles/mod/ezprojf\" \"${CMAKE_INSTALL_PREFIX}/include\")"
     )
