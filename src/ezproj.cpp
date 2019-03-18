@@ -236,9 +236,9 @@ std::string Ezproj::description(int epsg) {
 }
 
 std::string Ezproj::projVersion() {
-  return std::to_string(PROJ_VERSION_MAJOR) + "." +
-         std::to_string(PROJ_VERSION_MINOR) + "." +
-         std::to_string(PROJ_VERSION_PATCH);
+  return std::to_string(static_cast<unsigned long long>(PROJ_VERSION_MAJOR)) + "." +
+         std::to_string(static_cast<unsigned long long>(PROJ_VERSION_MINOR)) + "." +
+         std::to_string(static_cast<unsigned long long>(PROJ_VERSION_PATCH));
 }
 
 size_t Ezproj::position(int epsg) {
