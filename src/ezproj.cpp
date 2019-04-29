@@ -36,7 +36,8 @@ constexpr double s_todeg = 180.0 / s_pi;
  **/
 Ezproj::Ezproj() { this->_initialize(); }
 
-/** \brief Function to execute a coordinate system transformation using Proj4
+/** \brief Function to execute a coordinate system transformation ustd::sing
+ *Proj4
  *
  * @param[in]  inputEPSG  EPSG that coordinates are currently in
  * @param[in]  outputEPSG EPSG that the coordinates will be converted to
@@ -47,7 +48,7 @@ Ezproj::Ezproj() { this->_initialize(); }
  * @param[out] isLatLon   Bool that determine if the coordinates are lat/lon or
  *otherwise
  *
- * Function to execute a coordinate system transformation using Proj4
+ * Function to execute a coordinate system transformation ustd::sing Proj4
  *
  **/
 int Ezproj::transform(int inputEPSG, int outputEPSG, Point &input,
@@ -70,7 +71,8 @@ int Ezproj::transform(int inputEPSG, int outputEPSG, double x, double y,
   return ierr;
 }
 
-/** \brief Function to execute a coordinate system transformation using Proj4
+/** \brief Function to execute a coordinate system transformation ustd::sing
+ *Proj4
  *
  * @param[in]  inputEPSG  EPSG that coordinates are currently in
  * @param[in]  outputEPSG EPSG that the coordinates will be converted to
@@ -81,7 +83,7 @@ int Ezproj::transform(int inputEPSG, int outputEPSG, double x, double y,
  * @param[out] isLatLon   Bool that determine if the coordinates are lat/lon or
  *                        otherwise
  *
- * Function to execute a coordinate system transformation using Proj4
+ * Function to execute a coordinate system transformation ustd::sing Proj4
  *
  **/
 int Ezproj::transform(int inputEPSG, int outputEPSG, std::vector<Point> &input,
@@ -177,7 +179,7 @@ int Ezproj::cpp(double lambda0, double phi0, std::vector<Point> &input,
   double r = Ezproj::radiusEarth(phi0);
   output.reserve(input.size());
   for (auto &p : input) {
-    double x = r * (s_torad * p.first - slam0) * cos(sfea0);
+    double x = r * (s_torad * p.first - slam0) * std::cos(sfea0);
     double y = r * (s_torad * p.second);
     output.push_back(Point(x, y));
   }
@@ -213,7 +215,7 @@ int Ezproj::inverseCpp(double lambda0, double phi0, std::vector<Point> &input,
   double r = Ezproj::radiusEarth(phi0);
   output.reserve(input.size());
   for (auto &p : input) {
-    double x = s_todeg * (slam0 + p.first / (r * cos(sfea0)));
+    double x = s_todeg * (slam0 + p.first / (r * std::cos(sfea0)));
     double y = s_todeg * (p.second / r);
     output.push_back(Point(x, y));
   }
@@ -239,8 +241,10 @@ std::string Ezproj::description(int epsg) {
 }
 
 std::string Ezproj::projVersion() {
-  return std::to_string(static_cast<unsigned long long>(PROJ_VERSION_MAJOR)) + "." +
-         std::to_string(static_cast<unsigned long long>(PROJ_VERSION_MINOR)) + "." +
+  return std::to_string(static_cast<unsigned long long>(PROJ_VERSION_MAJOR)) +
+         "." +
+         std::to_string(static_cast<unsigned long long>(PROJ_VERSION_MINOR)) +
+         "." +
          std::to_string(static_cast<unsigned long long>(PROJ_VERSION_PATCH));
 }
 
@@ -256,8 +260,9 @@ size_t Ezproj::position(int epsg) {
 
 double Ezproj::radiusEarth(double latitude) {
   double l = s_torad * latitude;
-  return sqrt((pow(Ezproj::equitoralRadius(), 4.0) * cos(l) * cos(l) +
-               pow(Ezproj::polarRadius(), 4.0) * sin(l) * sin(l)) /
-              (pow(Ezproj::equitoralRadius(), 2.0) * cos(l) * cos(l) +
-               pow(Ezproj::polarRadius(), 2.0) * sin(l) * sin(l)));
+  return std::sqrt(
+      (std::pow(Ezproj::equitoralRadius(), 4.0) * std::cos(l) * std::cos(l) +
+       std::pow(Ezproj::polarRadius(), 4.0) * std::sin(l) * std::sin(l)) /
+      (std::pow(Ezproj::equitoralRadius(), 2.0) * std::cos(l) * std::cos(l) +
+       std::pow(Ezproj::polarRadius(), 2.0) * std::sin(l) * std::sin(l)));
 }
