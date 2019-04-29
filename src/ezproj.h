@@ -32,10 +32,10 @@
 #ifndef EZPROJ_H
 #define EZPROJ_H
 
+#include <array>
 #include <string>
 #include <utility>
 #include <vector>
-#include <unordered_map>
 
 using Point = std::pair<double, double>;
 
@@ -86,8 +86,7 @@ class Ezproj {
 
   const std::vector<const char *> *m_epsgDescriptions;
   const std::vector<const char *> *m_epsgInit;
-  const std::unordered_map<int, size_t> *m_epsgMapping;
-
+  const std::array<int, 6224> *m_epsgMapping;
 };
 
 #endif  // EZPROJ_H

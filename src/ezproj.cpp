@@ -17,6 +17,7 @@
 // along with EZPROJ.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------//
 #include "ezproj.h"
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <limits>
@@ -88,11 +89,11 @@ int Ezproj::transform(int inputEPSG, int outputEPSG, std::vector<Point> &input,
   assert(input.size() > 0);
   if (input.size() <= 0) return Ezproj::NoData;
 
-  if (this->m_epsgMapping->find(inputEPSG) == this->m_epsgMapping->end()) {
+  if (!this->containsEpsg(inputEPSG)) {
     return NoSuchProjection;
   }
 
-  if (this->m_epsgMapping->find(outputEPSG) == this->m_epsgMapping->end()) {
+  if (!this->containsEpsg(outputEPSG)) {
     return NoSuchProjection;
   }
 
@@ -142,8 +143,10 @@ int Ezproj::transform(int inputEPSG, int outputEPSG, std::vector<Point> &input,
 }
 
 bool Ezproj::containsEpsg(int epsg) {
-  return this->m_epsgMapping->find(epsg) == this->m_epsgMapping->end() ? false
-                                                                       : true;
+  return std::find(this->m_epsgMapping->begin(), this->m_epsgMapping->end(),
+                   epsg) == this->m_epsgMapping->end()
+             ? false
+             : true;
 }
 
 int Ezproj::cpp(double lambda0, double phi0, double x, double y, double &outx,
@@ -242,11 +245,12 @@ std::string Ezproj::projVersion() {
 }
 
 size_t Ezproj::position(int epsg) {
-  auto it = this->m_epsgMapping->find(epsg);
+  auto it =
+      std::find(this->m_epsgMapping->begin(), this->m_epsgMapping->end(), epsg);
   if (it == this->m_epsgMapping->end()) {
     return std::numeric_limits<size_t>::max();
   } else {
-    return this->m_epsgMapping->at(epsg);
+    return static_cast<size_t>(it - this->m_epsgMapping->begin());
   }
 }
 
