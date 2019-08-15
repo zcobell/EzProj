@@ -166,6 +166,7 @@ int main() {
 }\n" C99_MATH)
 
 # check needed include file
+cmake_policy(SET CMP0075 NEW)
 check_include_files (dlfcn.h HAVE_DLFCN_H)
 check_include_files (inttypes.h HAVE_INTTYPES_H)
 check_include_files (jni.h HAVE_JNI_H)
