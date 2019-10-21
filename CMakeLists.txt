@@ -15,8 +15,14 @@ ENABLE_LANGUAGE(CXX)
 INCLUDE (CheckIncludeFiles)
 INCLUDE (CheckLibraryExists) 
 INCLUDE (CheckFunctionExists)
+INCLUDE (GNUInstallDirs)
+INCLUDE (CMakePackageConfigHelpers)
+###########################################################################
 
-#...Set the default build type
+
+###########################################################################
+# DEFAULT BUILD TYPE
+###########################################################################
 IF(DEFINED CMAKE_BUILD_TYPE)
     SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of
         build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug
@@ -30,6 +36,8 @@ ELSE()
         options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release
         RelWithDebInfo MinSizeRel.")
 ENDIF()
+###########################################################################
+
 
 ###########################################################################
 #  GENERAL OPTIONS
@@ -169,6 +177,9 @@ int main() {
 IF(POLICY CMP0074)
     cmake_policy(SET CMP0074 NEW)
 ENDIF(POLICY CMP0074)
+IF(POLICY CMP0075)
+    cmake_policy(SET CMP0075 NEW)
+ENDIF(POLICY CMP0075)
 check_include_files (dlfcn.h HAVE_DLFCN_H)
 check_include_files (inttypes.h HAVE_INTTYPES_H)
 check_include_files (jni.h HAVE_JNI_H)
@@ -414,11 +425,13 @@ TARGET_LINK_LIBRARIES( ezproj proj )
 ADD_DEPENDENCIES( ezproj proj )
 SET(HEADER_DEST "include")
 SET_TARGET_PROPERTIES( ezproj PROPERTIES PUBLIC_HEADER "${HEADER_LIST}" ) 
-IF(EZPROJ_BUILD_SHARED)
-    INSTALL(TARGETS ezproj RUNTIME DESTINATION lib LIBRARY DESTINATION lib PUBLIC_HEADER DESTINATION include)
-ELSE(EZPROJ_BUILD_SHARED)
-    INSTALL(TARGETS ezproj ARCHIVE DESTINATION lib LIBRARY DESTINATION lib PUBLIC_HEADER DESTINATION include)
-ENDIF(EZPROJ_BUILD_SHARED)
+SET_TARGET_PROPERTIES( ezproj PROPERTIES SOVERSION ${EZPROJ_VERSION_MAJOR} VERSION ${EZPROJ_VERSION_STRING} )
+WRITE_BASIC_PACKAGE_VERSION_FILE( ezprojConfigVersion.cmake VERSION ${EZPROJ_VERSION_STRING} COMPATIBILITY SameMajorVersion )
+INSTALL( TARGETS ezproj RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT EZPROJ_RUNTIME
+                        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT EZPROJ_RUNTIME
+                        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT EZPROJ_DEVELOPMENT
+                        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT EZPROJ_DEVELOPMENT )
+INSTALL( FILES ${CMAKE_CURRENT_BINARY_DIR}/ezprojConfigVersion.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake )
 ###########################################################################
 
 
@@ -437,6 +450,11 @@ IF(EZPROJ_BUILD_FORTRAN)
     ELSE(EZPROJ_BUILD_SHARED)
         INSTALL(TARGETS ezprojf ARCHIVE DESTINATION lib LIBRARY DESTINATION lib)
     ENDIF(EZPROJ_BUILD_SHARED)
+    SET_TARGET_PROPERTIES( ezprojf PROPERTIES SOVERSION ${EZPROJ_VERSION_MAJOR} VERSION ${EZPROJ_VERSION_STRING} )
+    INSTALL( TARGETS ezprojf RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT EZPROJ_RUNTIME
+                             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT EZPROJ_RUNTIME
+                             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT EZPROJ_DEVELOPMENT
+                             PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT EZPROJ_DEVELOPMENT )
     INSTALL ( CODE
   "EXECUTE_PROCESS (COMMAND \"${CMAKE_COMMAND}\" -E copy_directory \"${CMAKE_BINARY_DIR}/CMakeFiles/mod/ezprojf\" \"${CMAKE_INSTALL_PREFIX}/include\")"
     )
