@@ -150,6 +150,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 find_package(PROJ4)
 if(PROJ4_FOUND)
   message(STATUS "Found System proj4")
+  message(STATUS "PROJ4 Header Dir: ${PROJ4_INCLUDE_DIR}")
+  message(STATUS "PROJ4 Library: ${PROJ4_LIBRARY}")
 else()
   # ############################################################################
   # PROJ Configuration Options

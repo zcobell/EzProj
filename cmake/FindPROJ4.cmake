@@ -24,7 +24,7 @@
 #    ENDIF()
 #ENDIF(WIN32)
 
-FIND_PATH(PROJ4_INCLUDE_DIR proj_api.h
+FIND_PATH(PROJ4_INCLUDE_DIR proj.h
     DOC "Path to PROJ.4 library include directory")
 
 SET(PROJ4_NAMES ${PROJ4_NAMES} proj proj_i)
